@@ -338,7 +338,7 @@ function renderLettering() {
   ];
   const wrap = document.createElement("div");
   wrap.className = "spacing lettering";
-  wrap.innerHTML = `<div class="big"><div class="hero">${stage(state)}</div></div><div class="sliders questions"></div>`;
+  wrap.innerHTML = `<div class="sliders questions"></div><div class="big"><div class="hero">${stage(state)}</div></div>`;
   const list = wrap.querySelector(".questions");
   questions.forEach((o, i) => {
     const row = document.createElement("div");
