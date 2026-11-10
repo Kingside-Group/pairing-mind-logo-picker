@@ -29,6 +29,7 @@ const SPACING = [
 ];
 const STEPS = [
   { id: "finish",  label: "Symbol finish" },
+  { id: "font", label: "Font" },
   { id: "wordmark", label: "Wordmark" },
   { id: "lettering", label: "Lettering" },
   { id: "spacing", label: "Spacing" },
@@ -225,6 +226,7 @@ function card({ s, opts, title, note, pressed, current, onPick, stageClass = "" 
   b.addEventListener("click", () => { onPick(); render(); });
   return b;
 }
+const stepLabel = () => `Step ${step + 1} of ${STEPS.length}`;
 function head(eyebrow, title, text) {
   const d = document.createElement("div");
   d.className = "step-head";
@@ -240,7 +242,7 @@ function group(title, hint, cls = "grid") {
 const variant = patch => ({ ...state, ...patch, sp: { ...state.sp, ...(patch.sp || {}) } });
 
 function renderFinish() {
-  main.append(head("Step 1 of 5", "Choose the symbol finish.", "The same symbol in four finishes. Pick the surface that feels right. The name comes next."));
+  main.append(head(stepLabel(), "Choose the symbol finish.", "The same symbol in four finishes. Pick the surface that feels right. The font comes next."));
   const g = group("Symbol finish", "");
   const grid = g.querySelector(".grid");
   for (const [k, t] of Object.entries(TEXTURES)) {
@@ -253,25 +255,36 @@ function renderFinish() {
   main.append(g);
 }
 
-function renderWordmark() {
-  main.append(head("Step 2 of 5", "Choose the wordmark.", "Two ways to write the name, each in three fonts. Your symbol finish is carried forward."));
-  for (const [sk, st] of Object.entries(STYLES)) {
-    const g = group(st.label, st.note);
-    const grid = g.querySelector(".grid");
-    for (const [fk, f] of Object.entries(FONTS)) {
-      grid.append(card({
-        s: variant({ style: sk, font: fk }), opts: {},
-        title: f.label, note: f.note, current: st.current && f.current,
-        pressed: state.style === sk && state.font === fk,
-        onPick: () => { state.style = sk; state.font = fk; },
-      }));
-    }
-    main.append(g);
+function renderFont() {
+  main.append(head(stepLabel(), "Choose the font.", "Three fonts for the name. Your symbol finish is carried forward."));
+  const g = group("Font", "Shown in the current wordmark");
+  const grid = g.querySelector(".grid");
+  for (const [fk, f] of Object.entries(FONTS)) {
+    grid.append(card({
+      s: variant({ font: fk }), opts: {},
+      title: f.label, note: f.note, current: f.current, pressed: state.font === fk,
+      onPick: () => { state.font = fk; },
+    }));
   }
+  main.append(g);
+}
+
+function renderWordmark() {
+  main.append(head(stepLabel(), "Choose the wordmark.", "Two ways to write the name, in the font you picked."));
+  const g = group("Wordmark", FONTS[state.font].label, "grid two");
+  const grid = g.querySelector(".grid");
+  for (const [sk, st] of Object.entries(STYLES)) {
+    grid.append(card({
+      s: variant({ style: sk }), opts: {},
+      title: st.label, note: st.note, current: st.current, pressed: state.style === sk,
+      onPick: () => { state.style = sk; },
+    }));
+  }
+  main.append(g);
 }
 
 function renderLettering() {
-  main.append(head("Step 3 of 5", "Style the lettering.", "Three small choices. Each pair shows your logo both ways."));
+  main.append(head(stepLabel(), "Style the lettering.", "Three small choices. Each pair shows your logo both ways."));
   const sets = [
     { title: "First letter", hint: "Lowercase or capital P", opts: [
       { patch: { capP: false }, title: "Lowercase p", note: "Soft and approachable", current: true },
@@ -301,7 +314,7 @@ function renderLettering() {
 }
 
 function renderSpacing() {
-  main.append(head("Step 4 of 5", "Fine-tune the spacing.", "Move a slider to adjust. The middle of each slider is the spacing as designed."));
+  main.append(head(stepLabel(), "Fine-tune the spacing.", "Move a slider to adjust. The middle of each slider is the spacing as designed."));
   const wrap = document.createElement("div");
   wrap.className = "spacing";
   wrap.innerHTML = `<div class="big"><div class="hero"></div><div class="smallcheck"></div></div><div class="sliders"></div>`;
@@ -334,7 +347,7 @@ function renderSpacing() {
 }
 
 function renderExport() {
-  main.append(head("Step 5 of 5", "Review and export.", "Pick a layout, check it on light and dark, then download. Exports are true vector: letters are converted to shapes."));
+  main.append(head(stepLabel(), "Review and export.", "Pick a layout, check it on light and dark, then download. Exports are true vector: letters are converted to shapes."));
   const g = group("Layout", "", "grid two");
   const grid = g.querySelector(".grid");
   for (const [k, title, note] of [["row", "Side by side", "For headers and navigation"], ["stack", "Stacked", "For square spaces and social profiles"]]) {
@@ -460,7 +473,7 @@ function paintSteps() {
 function render() {
   const y = window.scrollY;
   main.innerHTML = "";
-  [renderFinish, renderWordmark, renderLettering, renderSpacing, renderExport][step]();
+  [renderFinish, renderFont, renderWordmark, renderLettering, renderSpacing, renderExport][step]();
   paintSteps();
   paintSoFar();
   saveHash();
