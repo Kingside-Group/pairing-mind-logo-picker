@@ -246,13 +246,59 @@ function renderFinish() {
   const g = group("Symbol finish", "");
   const grid = g.querySelector(".grid");
   for (const [k, t] of Object.entries(TEXTURES)) {
-    grid.append(card({
+    const wrap = document.createElement("div");
+    wrap.className = "cardwrap";
+    wrap.append(card({
       s: variant({ texture: k }), opts: {layout: "mark"},
       title: t.label, note: t.note, current: t.current, pressed: state.texture === k, stageClass: "mark-only",
       onPick: () => { state.texture = k; },
     }));
+    const zoom = document.createElement("button");
+    zoom.className = "zoom";
+    zoom.setAttribute("aria-label", `Zoom in on ${t.label}`);
+    zoom.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg><span>Zoom</span>`;
+    zoom.addEventListener("click", () => openZoom(k));
+    wrap.append(zoom);
+    grid.append(wrap);
   }
   main.append(g);
+}
+
+/* Focused view of one symbol finish, large, on light and dark. */
+function openZoom(k) {
+  let dlg = document.getElementById("zoom");
+  if (!dlg) {
+    dlg = document.createElement("dialog");
+    dlg.id = "zoom";
+    dlg.setAttribute("aria-labelledby", "zoom-title");
+    document.body.append(dlg);
+    dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") { e.preventDefault(); dlg.querySelector("[data-go='1']").click(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); dlg.querySelector("[data-go='-1']").click(); }
+    });
+  }
+  const keys = Object.keys(TEXTURES), t = TEXTURES[k], i = keys.indexOf(k);
+  const chosen = state.texture === k;
+  dlg.innerHTML = `
+    <div class="zoom-head">
+      <div><span class="eyebrow">Symbol finish ${i + 1} of ${keys.length}</span><h2 id="zoom-title">${t.label}${t.current ? ' <span class="tag">Current</span>' : ""}</h2><p>${t.note}</p></div>
+      <button class="btn small" data-close>Close</button>
+    </div>
+    <div class="zoom-stage">
+      <div class="half light">${buildSVG(variant({ texture: k }), { theme: "light", layout: "mark" })}</div>
+      <div class="half dark">${buildSVG(variant({ texture: k }), { theme: "dark", layout: "mark" })}</div>
+    </div>
+    <div class="zoom-foot">
+      <div class="zoom-nav"><button class="btn small" data-go="-1" aria-label="Previous finish">‹ Previous</button><button class="btn small" data-go="1" aria-label="Next finish">Next ›</button></div>
+      <button class="btn ${chosen ? "" : "primary"}" data-choose ${chosen ? "disabled" : ""}>${chosen ? "Chosen" : "Choose this finish"}</button>
+    </div>`;
+  dlg.querySelector("[data-close]").addEventListener("click", () => dlg.close());
+  dlg.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => openZoom(keys[(i + Number(b.dataset.go) + keys.length) % keys.length])));
+  dlg.querySelector("[data-choose]").addEventListener("click", () => { state.texture = k; dlg.close(); render(); });
+  if (!dlg.open) dlg.showModal();
+  dlg.querySelector("[data-close]").focus();
+  dlg.scrollTop = 0;
 }
 
 function renderFont() {

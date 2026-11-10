@@ -167,3 +167,21 @@ h1{font:700 22px/1.1 Jakarta,sans-serif;letter-spacing:-.6px;margin:2px 0 0}
 .opt .stage.mark-only .half svg{height:110px}
 .sofar-preview .half{flex:1 1 0;min-width:0}
 .sofar-preview .half svg{width:100%;height:100%;max-width:none}
+
+/* Zoom on symbol finish cards */
+.cardwrap{position:relative;display:grid}
+.zoom{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;border:1px solid #ffffffb0;background:rgba(255,255,255,.88);backdrop-filter:blur(6px);border-radius:999px;padding:6px 12px 6px 9px;font:600 13px Jakarta,sans-serif;color:var(--ink);box-shadow:0 2px 8px #1c2b4420;opacity:.85;transition:opacity .15s,transform .15s}
+.zoom svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.cardwrap:hover .zoom,.zoom:focus-visible{opacity:1}
+.zoom:hover{transform:scale(1.04)}
+dialog#zoom{border:0;border-radius:22px;padding:0;width:min(1100px,94vw);max-height:92vh;background:var(--card);color:var(--ink);box-shadow:0 30px 80px #0b142640;overflow:auto}
+dialog#zoom::backdrop{background:#101826b8;backdrop-filter:blur(8px)}
+.zoom-head{display:flex;justify-content:space-between;align-items:start;gap:20px;padding:24px 28px 18px}
+.zoom-head h2{font:700 28px/1.15 Jakarta,sans-serif;letter-spacing:-.8px;margin:4px 0 4px;display:flex;align-items:center;gap:10px}
+.zoom-head p{margin:0;color:var(--muted)}
+.zoom-stage{display:grid;grid-template-columns:1fr 1fr}
+.zoom-stage .half{padding:56px 40px;min-height:min(56vh,460px)}
+.zoom-stage .half svg{width:100%;height:auto;max-width:400px;max-height:46vh}
+.zoom-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 28px 22px;flex-wrap:wrap}
+.zoom-nav{display:flex;gap:8px}
+@media(max-width:700px){.zoom-stage .half{min-height:0;padding:30px 14px}.zoom-stage .half svg{max-height:34vh}.zoom-head h2{font-size:23px}.zoom-head{padding:20px}.zoom-foot{padding:14px 20px 18px}}
