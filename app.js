@@ -330,33 +330,28 @@ function renderWordmark() {
 }
 
 function renderLettering() {
-  main.append(head(stepLabel(), "Style the lettering.", "Three small choices. Each pair shows your logo both ways."));
-  const sets = [
-    { title: "First letter", hint: "Lowercase or capital P", opts: [
-      { patch: { capP: false }, title: "Lowercase p", note: "Soft and approachable", current: true },
-      { patch: { capP: true }, title: "Capital P", note: "Reads as a proper name" },
-    ], is: o => state.capP === o.patch.capP },
-    { title: "The “ai”", hint: "Highlight the ai inside pairing", opts: [
-      { patch: { blueAi: true }, title: "Blue ai", note: "Points to the AI in pairing", current: true },
-      { patch: { blueAi: false }, title: "Same color", note: "The symbol carries the blue" },
-    ], is: o => state.blueAi === o.patch.blueAi },
-    { title: "Weight", hint: "How heavy the letters are", opts: [
-      { patch: { weight: 600 }, title: "Medium", note: "Lighter and calmer" },
-      { patch: { weight: 750 }, title: "Bold", note: "Stronger at small sizes", current: true },
-    ], is: o => state.weight === o.patch.weight },
+  main.append(head(stepLabel(), "Style the lettering.", "Three quick questions. Answer yes or no and the preview updates."));
+  const questions = [
+    { q: "Capitalize the P?", help: "A capital reads as a proper name. Lowercase feels softer.", get: () => state.capP, set: v => { state.capP = v; }, current: false },
+    { q: "Color the ai letters blue?", help: "Points to the AI inside pairing. Without it, the symbol carries the blue.", get: () => state.blueAi, set: v => { state.blueAi = v; }, current: true },
+    { q: "Use bold letters?", help: "Bold holds up at small sizes. No gives a lighter, calmer medium weight.", get: () => state.weight === 750, set: v => { state.weight = v ? 750 : 600; }, current: true },
   ];
-  for (const set of sets) {
-    const g = group(set.title, set.hint, "grid two");
-    const grid = g.querySelector(".grid");
-    for (const o of set.opts) {
-      grid.append(card({
-        s: variant(o.patch), opts: {},
-        title: o.title, note: o.note, current: o.current, pressed: set.is(o),
-        onPick: () => Object.assign(state, o.patch),
-      }));
-    }
-    main.append(g);
-  }
+  const wrap = document.createElement("div");
+  wrap.className = "spacing lettering";
+  wrap.innerHTML = `<div class="big"><div class="hero">${stage(state)}</div></div><div class="sliders questions"></div>`;
+  const list = wrap.querySelector(".questions");
+  questions.forEach((o, i) => {
+    const row = document.createElement("div");
+    row.className = "question";
+    const id = `q${i}`;
+    row.innerHTML = `<div class="q-text"><h3 id="${id}">${o.q}</h3><p>${o.help}</p><p class="today">Website today: ${o.current ? "yes" : "no"}</p></div>
+      <div class="yesno" role="radiogroup" aria-labelledby="${id}">
+        ${[true, false].map(v => `<button role="radio" aria-checked="${o.get() === v}" data-v="${v}">${v ? "Yes" : "No"}</button>`).join("")}
+      </div>`;
+    row.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { o.set(b.dataset.v === "true"); render(); }));
+    list.append(row);
+  });
+  main.append(wrap);
 }
 
 function renderSpacing() {

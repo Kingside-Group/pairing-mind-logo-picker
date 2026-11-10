@@ -185,3 +185,17 @@ dialog#zoom::backdrop{background:#101826b8;backdrop-filter:blur(8px)}
 .zoom-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 28px 22px;flex-wrap:wrap}
 .zoom-nav{display:flex;gap:8px}
 @media(max-width:700px){.zoom-stage .half{min-height:0;padding:30px 14px}.zoom-stage .half svg{max-height:34vh}.zoom-head h2{font-size:23px}.zoom-head{padding:20px}.zoom-foot{padding:14px 20px 18px}}
+
+/* Lettering: yes/no questions beside one preview */
+.question{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:18px 0;border-bottom:1px solid #eef0f4}
+.question:last-child{border-bottom:0}
+.q-text h3{font:650 16px Jakarta,sans-serif;letter-spacing:-.2px;margin:0}
+.q-text p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+.yesno{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#e8ecf2;flex:none}
+.yesno button{border:0;background:transparent;border-radius:7px;padding:8px 16px;font:600 14px Jakarta,sans-serif;color:var(--muted);display:flex;flex-direction:column;align-items:center;min-width:62px;line-height:1.1}
+.yesno button[aria-checked=true]{background:var(--action);color:#fff;box-shadow:0 2px 6px #2161db40}
+.yesno .now{font:500 10px Source,sans-serif;letter-spacing:.02em;opacity:.75;margin-top:2px}
+.lettering .big{min-height:0}
+.q-text p.today{font-size:12px;color:#8a93a1;margin-top:4px}
+.yesno button{padding:9px 18px}
+@media(max-width:860px){.question{flex-direction:column;align-items:stretch;gap:10px}.yesno{align-self:flex-start}}
