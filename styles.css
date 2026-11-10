@@ -206,3 +206,9 @@ dialog#zoom::backdrop{background:#101826b8;backdrop-filter:blur(8px)}
 .lettering .big .hero .half{padding:26px 34px}
 .lettering .big .hero .half svg{max-width:460px;max-height:22vh}
 @media(max-width:860px){.lettering .questions{grid-template-columns:minmax(0,1fr)}.lettering .question{border-bottom:1px solid #eef0f4}.lettering .question:last-child{border-bottom:0}}
+/* Placement: stacked lockups need height, so light and dark sit side by side */
+.grid.placement{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.placement .opt .stage{height:300px}
+.grid.placement .opt .stage.split{flex-direction:row;height:300px}
+.grid.placement .opt .stage.split .half{padding:18px 16px}
+@media (max-width:860px){.grid.placement .opt .stage,.grid.placement .opt .stage.split{height:240px}}

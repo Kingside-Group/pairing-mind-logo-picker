@@ -1,13 +1,14 @@
 # Pairing Mind logo picker
 
-A six-step page for Chad and Kyle to choose the Pairing Mind logo, one decision at a time:
+A seven-step page for Chad and Kyle to choose the Pairing Mind logo, one decision at a time:
 
 1. Symbol finish: flat, lifted flat, soft satin, defined edge
 2. Font: Plus Jakarta Sans, Archivo or Outfit
 3. Wordmark: `pairing mind` or `pairing MIND`
 4. Lettering: lowercase or capital P, blue or plain "ai", medium or bold
-5. Spacing: letters in each word, the gap between words, the gap to the symbol, symbol size
-6. Review on light and dark, pick side-by-side or stacked, and download SVG or PNG
+5. Placement: name beside, below or above the symbol
+6. Spacing: letters in each word, the gap between words, the gap to the symbol, symbol size
+7. Review on light and dark, and download SVG or PNG
 
 Every option shows on light and dark backgrounds. The address bar holds the current picks, so a copied link reopens the same logo.
 

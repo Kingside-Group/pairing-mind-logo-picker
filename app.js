@@ -32,10 +32,16 @@ const STEPS = [
   { id: "font", label: "Font" },
   { id: "wordmark", label: "Wordmark" },
   { id: "lettering", label: "Lettering" },
+  { id: "placement", label: "Placement" },
   { id: "spacing", label: "Spacing" },
   { id: "export",  label: "Export" },
 ];
 
+const LAYOUTS = {
+  row:   { label: "Name beside the symbol", short: "Side by side", note: "For headers and navigation", file: "horizontal" },
+  stack: { label: "Name below the symbol", short: "Name below", note: "For square spaces and social profiles", file: "stacked" },
+  above: { label: "Name above the symbol", short: "Name above", note: "For title cards and signage", file: "stacked-above" },
+};
 const DEFAULTS = {
   texture: "flat", style: "original", font: "jakarta",
   capP: false, blueAi: true, weight: 750, layout: "row",
@@ -156,6 +162,15 @@ function buildSVG(s, opts = {}) {
     const h = 700 / 4; parts.push(markGroup(m, 0, 0, h)); box = { x1: 0, y1: 0, x2: h * 820 / 700, y2: h };
   } else if (layout === "word") {
     parts.push(words(0, 0)); box = tb;
+  } else if (layout === "above") {
+    const mh = 2.6 * S * sizeK, mw = mh * 820 / 700;
+    const gap = (0.55 + sp.mark / 1000) * S;
+    const textW = tb.x2 - tb.x1;
+    const cx = textW / 2;
+    const markTop = tb.y2 + gap;
+    parts.push(words(-tb.x1, 0));
+    parts.push(markGroup(m, cx - mw / 2, markTop, mh));
+    box = { x1: Math.min(0, cx - mw / 2), y1: tb.y1, x2: Math.max(textW, cx + mw / 2), y2: markTop + mh };
   } else if (layout === "stack") {
     const mh = 2.6 * S * sizeK, mw = mh * 820 / 700;
     const gap = (0.55 + sp.mark / 1000) * S;
@@ -201,7 +216,7 @@ function summaryList(s) {
     ["The “ai”", s.blueAi ? "Blue" : "Same color as the name"],
     ["Weight", WEIGHTS[s.weight]],
     ["Spacing", spacingText(s)],
-    ["Layout", s.layout === "stack" ? "Stacked" : "Side by side"],
+    ["Placement", LAYOUTS[s.layout].label],
   ];
 }
 function summaryLine(s) {
@@ -354,6 +369,16 @@ function renderLettering() {
   main.append(wrap);
 }
 
+function renderPlacement() {
+  main.append(head(stepLabel(), "Place the name.", "Where the name sits around the symbol. The next step fine-tunes the gap between them."));
+  const g = group("Placement", "Your lettering carried forward", "grid placement");
+  const grid = g.querySelector(".grid");
+  for (const [k, o] of Object.entries(LAYOUTS)) {
+    grid.append(card({ s: variant({ layout: k }), opts: {}, title: o.label, note: o.note, current: k === "row", pressed: state.layout === k, onPick: () => { state.layout = k; } }));
+  }
+  main.append(g);
+}
+
 function renderSpacing() {
   main.append(head(stepLabel(), "Fine-tune the spacing.", "Move a slider to adjust. The middle of each slider is the spacing as designed."));
   const wrap = document.createElement("div");
@@ -388,13 +413,7 @@ function renderSpacing() {
 }
 
 function renderExport() {
-  main.append(head(stepLabel(), "Review and export.", "Pick a layout, check it on light and dark, then download. Exports are true vector: letters are converted to shapes."));
-  const g = group("Layout", "", "grid two");
-  const grid = g.querySelector(".grid");
-  for (const [k, title, note] of [["row", "Side by side", "For headers and navigation"], ["stack", "Stacked", "For square spaces and social profiles"]]) {
-    grid.append(card({ s: variant({ layout: k }), opts: {}, title, note, pressed: state.layout === k, onPick: () => { state.layout = k; } }));
-  }
-  main.append(g);
+  main.append(head(stepLabel(), "Review and export.", "Check it on light and dark, then download. Exports are true vector: letters are converted to shapes."));
 
   const final = document.createElement("div");
   final.className = "final";
@@ -422,7 +441,7 @@ function renderExport() {
 
 /* ---------- Export ---------- */
 function fileName(kind, t, ext) {
-  const what = kind === "full" ? (state.layout === "stack" ? "stacked" : "horizontal") : kind === "word" ? "wordmark" : "symbol";
+  const what = kind === "full" ? LAYOUTS[state.layout].file : kind === "word" ? "wordmark" : "symbol";
   const word = kind === "mark" ? "" : `-${state.style === "caps" ? "MIND" : "mind"}-${state.font}`;
   return `pairing-mind-${what}-${state.texture}${word}-${t}.${ext}`;
 }
@@ -481,7 +500,7 @@ function readHash() {
   if (q.has("p")) state.capP = q.get("p") === "1";
   if (q.has("ai")) state.blueAi = q.get("ai") === "1";
   state.weight = Number(pick(q.get("wt"), ["600", "750"], String(state.weight)));
-  state.layout = pick(q.get("l"), ["row", "stack"], state.layout);
+  state.layout = pick(q.get("l"), Object.keys(LAYOUTS), state.layout);
   for (const o of SPACING) {
     const v = Number(q.get(`s_${o.key}`));
     if (Number.isFinite(v)) state.sp[o.key] = Math.max(o.min, Math.min(o.max, v));
@@ -514,7 +533,7 @@ function paintSteps() {
 function render() {
   const y = window.scrollY;
   main.innerHTML = "";
-  [renderFinish, renderFont, renderWordmark, renderLettering, renderSpacing, renderExport][step]();
+  [renderFinish, renderFont, renderWordmark, renderLettering, renderPlacement, renderSpacing, renderExport][step]();
   paintSteps();
   paintSoFar();
   saveHash();
